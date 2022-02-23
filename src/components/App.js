@@ -1,72 +1,104 @@
-import React from "react";
+import React, { useState } from "react";
 import "./../styles/App.css";
+import Task from "./Task";
 
-import React, {useState} from "react";
-import "./App.css";
+function App() {
 
-function App() 
-{
-	const [tasks,setTasks]=useState([]);
-    const [text,setText]=useState("");
-    const [si,setSi]=useState(-1);
-	const [edit,setEdit]=useState("");
+	const [task, setTask] = useState()
+	const [taskList, setTaskList] = useState([])
+	const [edit, setEdit] = useState(false)
+	const [editIndex,setEditIndex] = useState(null)
+	const [editedTask,setEditedTask]= useState()
+	const [savedTask,setSavedTask]= useState()
+	const [saved,setSaved]= useState()
+
 	
-	const addTask = (title) =>{
-		if(title!=""){
-		const newT=[...tasks,{title}];
-        setTasks(newT);
-        setText("");
-		}
-        
-    };
-    const deleteTask = (index) =>{
-        const newT=[...tasks];
-        newT.splice(index,1);
-        setTasks(newT)
-	};
-	
-	const changeTask = (event) =>{
-		setText(event.target.value);
+	const taskHandler = (e) => {
+		setTask(e.target.value)
+
 	}
-	const submitTask = (event) =>{
-		// event.preventDefault();
-		if(!edit) return;
-		const newT=[...tasks];
-		newT[si].title=edit;
-		setTasks(newT);
-        setEdit("");
-        setText("");
-		setSi(-1);
-	};
-   
+
+	const savedTaskHandler = (e)=>{
+		setSavedTask(e.target.value)
+		
+	}
+
+	const AddTaskHandler = () => {
+		setTaskList([...taskList, task])
+		setTask("")
+
+	}
+
+	const editHandler = (index)=>{
+		setEdit(true)
+		setEditIndex(index)
+		
+	}
+
+	const saveTaskHandler = ()=>{
+		
+		let  editedTask = [...taskList];
+		editedTask[editIndex]=savedTask
+		setTaskList(editedTask)
+		setSaved(true)
+		setEdit(false)
+		
+		console.log(saved)
+
+		
+
+	}
+
+	const deleteHandler = (index)=>{
+	
+   let deletedTaskList = [...taskList]
+	deletedTaskList.splice(index, 1)
+	setTaskList(deletedTaskList)
+	console.log(taskList)
+
+	
+
+
+	}
 	return (
 		<div id="main">
-		<textarea type="text" id="task" onChange={changeTask}  placeholder="Add a new task..."></textarea>
-		<button type="button" id="btn" onClick={()=>addTask(text)}>Add</button>
-		<ol>
-		{
-			tasks.map((task,index)=>(
-				<li key={index}>
-					<>
-                        <span className="list">{task.title}</span>
-					<button className="edit" onClick={()=>{setSi(index)}}>Edit</button>					
-					<button id={index} className="delete" onClick={()=>deleteTask(index)}>Delete</button>
-                    </>
-					{
-						(si===index)?
-						<>
-							<textarea className="editTask" type="text" id="editedTask" onChange={(evt)=>{setEdit(evt.target.value)}} ></textarea>
-							<button className="saveTask" type="button" id="submit" onClick={submitTask}>Submit</button>
-						</>
-						:(null)
-					}
-				</li>
-			))
-		}
-		</ol>
-	</div>
+			<div><textarea value={task} id="task" onChange={(e) => taskHandler(e) } placeholder="enter task here">
+			</textarea>
+						
+			</div>
+			<button id="btn" onClick={AddTaskHandler}  disabled={task==="" ?true:false} >Add Task</button>
+
+
+			<div id="task-list">
+				<ol>
+					{taskList.map((tasks,index) => {
+						console.log(tasks.toString())
+						
+						return 	<li key={tasks.toString()} className="list">{tasks}
+
+							{!edit &&  <button className="edit" onClick={()=>editHandler(index)}>Edit </button>}
+							{!edit &&   <button className="delete" onClick={()=>deleteHandler(index)}>Delete</button>}
+						{ edit  && index==editIndex ? <>
+								<textarea value={savedTask} key={index} className="editTask" onChange={(e) => savedTaskHandler(e) } > </textarea> 
+								
+								<button className="saveTask" onClick={saveTaskHandler}  disabled={savedTask===""?true:false}  >Save</button></>:null
+								} 
+							
+					</li>
+
+					})}
+				</ol>
+
+			</div>
+
+			{/* //Do not alter main div
+		//Please do not alter the functional component as tests depend on the type of component. */}
+		</div>
 	);
 }
 
 
 export default App;
+
+
+
